@@ -1,23 +1,29 @@
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
+
+  const wave = () => {
+
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="mainContainer">
+
+      <div className="dataContainer">
+        <div className="header">
+          Me manda um anime. 📺
+        </div>
+
+        <div className="bio">
+          <p>Olá, sou o Jholl.</p>
+          <p>Tem algum anime legal? Me diz o nome. XD</p>
+          <p>🚛 lhe levara para bons isekais.</p>
+        </div>
+
+        <button className="waveButton" onClick={wave}>
+          Me conta ai
+        </button>
+      </div>
     </div>
   );
 }
