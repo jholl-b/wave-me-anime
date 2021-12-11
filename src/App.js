@@ -18,7 +18,7 @@ function App() {
       const accounts = await ethereum.request({ method: 'eth_accounts' });
 
       if (accounts.length !== 0) {
-        const account = account[0];
+        const account = accounts[0];
         console.log(`Found an authorized account: ${account}`);
         setCurrentAccount(account);
       } else {
