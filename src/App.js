@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
+import Abi from './utils/WavePortal.json';
 import './App.css';
 
 function App() {
   const [currentAccount, setCurrentAccount] = useState("");
+  const [animeToSend, setAnimeToSend] = useState("");
+  const [animeWaved, setAnimeWaved] = useState(0);
+  const [nameAnimeWaved, setNameAnimeWaved] = useState("");
+  const contractAddress = "0x0D33F03F7Aab650F04383441F1ed8657adb42124";
+  const contractABI = Abi.abi;
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -30,6 +37,48 @@ function App() {
     }
   }
 
+  const getTotalWaves = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        let count = await wavePortalContract.getTotalWaves();
+        setAnimeWaved(count.toNumber());
+        
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getWavedAnime = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        let anime = await wavePortalContract.getWavedAnime();
+        setNameAnimeWaved(anime);
+        
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
@@ -49,12 +98,71 @@ function App() {
     }
   }
 
-  const wave = () => {
+  // const wave = async () => {
+  //   try {
+  //     const { ethereum } = window;
 
+  //     if (ethereum) {
+  //       const provider = new ethers.providers.Web3Provider(ethereum);
+  //       const signer = provider.getSigner();
+  //       const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+  //       let count = await wavePortalContract.getTotalWaves();
+  //       console.log(`Retrieved total wave count... ${count.toNumber()}`);
+
+  //       const waveTxn = await wavePortalContract.waveAnime("One Piece");
+  //       console.log("Mining...", waveTxn.hash);
+
+  //       await waveTxn.wait();
+  //       console.log("Mined -- ", waveTxn.hash);
+
+  //       count = await wavePortalContract.getTotalWaves();
+  //       console.log("Retrieved total wave count...", count.toNumber());
+        
+  //     } else {
+  //       console.log("Ethereum object doesn1t exist!");
+  //     }
+
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
+  const waveAnime = async (e) => {
+
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        const waveTxn = await wavePortalContract.waveAnime(animeToSend);
+        console.log("Mining...", waveTxn.hash);
+
+        await waveTxn.wait();
+        console.log("Mined -- ", waveTxn.hash);
+
+        let count = await wavePortalContract.getTotalWaves();
+        console.log(`Retrieved total wave count... ${count.toNumber()}`);
+        setAnimeWaved(count.toNumber());
+        
+      } else {
+        console.log("Ethereum object doesn1t exist!");
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+
+    e.preventDefault();
   }
 
   useEffect(() => {
     checkIfWalletIsConnected();
+    getTotalWaves();
+    getWavedAnime();
   });
 
   return (
@@ -71,15 +179,36 @@ function App() {
           <p>🚛 lhe levara para bons isekais.</p>
         </div>
 
-        <button className="waveButton" onClick={wave}>
+        {/* <button className="waveButton" onClick={wave}>
           Me conta ai
-        </button>
+        </button> */}
+
+        {currentAccount && (
+          <form onSubmit={waveAnime}>
+            <label>
+              Anime: 
+              <input 
+                className="animeInput"
+                type="text" 
+                name="anime" 
+                value={animeToSend}
+                onChange={(e) => setAnimeToSend(e.target.value)} />
+            </label>
+            <input 
+              type="submit" className="waveButton enviar" value="Enviar" />
+          </form>
+        )}
 
         {!currentAccount && (
           <button className="waveButton" onClick={connectWallet}>
             Conectar Carteira
           </button>
         )}
+
+        <div>
+          <h5>Você me sugeriu: {nameAnimeWaved}</h5>
+          <h5>Total de sugestões: {animeWaved}</h5>
+        </div>
       </div>
     </div>
   );
